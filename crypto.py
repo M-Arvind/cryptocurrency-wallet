@@ -265,7 +265,8 @@ def frame4():
     recieve_button = Button(frame4, text="RECIEVE").place(x=150, y=250, width=100, height=35)
 
     data_table()
-
+def kaka():
+    pass
 
 frame1()
 
