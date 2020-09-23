@@ -269,7 +269,6 @@ def frame4():
 
 frame1()
 
-def arvind():
-    pass
+
 
 root.mainloop()
