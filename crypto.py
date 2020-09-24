@@ -36,6 +36,11 @@ CURRENT_INR_ETH = 28116.13
 CURRENT_DOLLAR_ETH = 381.96
 CURRENT_EURO_ETH = 322.61
 
+MIN_BTC_ENTRY=0.002
+MIN_BCH_ENTRY=0.05
+MIN_LIT_ENTRY=0.2
+MIN_ETH_ENTRY=0.1
+
 ##MIN_INR_BTC=1613.18
 ##MIN_DOLLAR_BTC=21.93
 ##MIN_EURO_BTC=18.77
@@ -59,8 +64,8 @@ def frame1():
     global amount_entry
     global value_entry
 
-    global amount
-    amount = DoubleVar()
+    global coins
+    coins = DoubleVar()
 
     global value
     value = DoubleVar()
@@ -83,7 +88,7 @@ def frame1():
     currencytype_menu.place(x=345, y=515, width=172)
     currencytype_menu.current(0)
     # entry menu
-    amount_entry = Entry(frame1, width=13, borderwidth=2, textvariable = amount).place(x=631, y=515)
+    coins_entry = Entry(frame1, width=13, borderwidth=2, textvariable = coins).place(x=631, y=515)
     value_entry = Entry(frame1, width=13, borderwidth=2, textvariable = value).place(x=823, y=515)
 
     # Buttons
@@ -94,100 +99,65 @@ def frame1():
 
 def min_value_error():
     error_window=Toplevel()
-    error_window.geometry("500x400+385+200")
+    error_window.geometry("500x250+385+200")
     error_window_label=Label(error_window, text="THE AMOUNT YOU HAVE ENTERED IS LOWER THAN THE MINIMUM ENTRY.").place(x=50, y=50)
     error_window_label2=Label(error_window, text="PLEASE CHECK THE MINIMUM VALUES GIVEN BELOW:").place(x=50, y=70)
-    error_window_label3=Label(error_window, text='''MINIMUM BTC(INR)=1613.18
-MINIMUM BTC(DOLLAR)=21.93
-MINIMUM BTC(EURO)=18.77
-
-MINIMUM BCH(INR)=847.44
-MINIMUM BCH(DOLLAR)=11.52
-MINIMUM BCH(EURO)=9.86
-
-MINIMUM ETH(INR)=2810.87
-MINIMUM ETH(DOLLAR)=38.2
-MINIMUM ETH(EURO)=32.71
-
-MINIMUM LIT(INR)=712.08
-MINIMUM LIT(DOLLAR)=9.68
-MINIMUM LIT(EURO)=8.29''', font="TimesNewRoman 9").place(x=155, y=100)
+    error_window_label3=Label(error_window, text='''MINIMUM BTC- 0.002
+MINIMUM BCH- 0.05
+MINIMUM LIT- 0.2
+MINIMUM ETH- 0.1''', font="TimesNewRoman 11").place(x=175, y=100)
 
 def calculation():
     cryptype = cryptype_menu.get()
     currency_type = currencytype_menu.get()
 
-    Amount = amount.get()
+    Amount = coins.get()
     Value=0
 
     if cryptype == "BTC":
-        if currency_type == "INR":
-            if Amount<MIN_INR_BTC:
-                min_value_error()
-            elif Amount>=MIN_INR_BTC:
+        if Amount<MIN_BTC_ENTRY:
+            min_value_error()
+        elif Amount>=MIN_BTC_ENTRY:
+            if currency_type == "INR":
                 Value = Amount *float(CURRENT_INR_BTC)
-        elif currency_type == "DOLLARS":
-            if Amount<MIN_DOLLAR_BTC:
-                min_value_error()
-            elif Amount>=MIN_DOLLAR_BTC:
+            elif currency_type == "DOLLARS":
                 Value = Amount * float(CURRENT_DOLLAR_BTC)
-        elif currency_type == "EUROS":
-            if Amount<MIN_EURO_BTC:
-                min_value_error()
-            elif Amount>=MIN_EURO_BTC:
+            elif currency_type == "EUROS":
                 Value = Amount * float(CURRENT_EURO_BTC)
 
     elif cryptype == "BCH":
-        if currency_type == "INR":
-            if Amount<MIN_INR_BCH:
-                min_value_error()
-            elif Amount>=MIN_INR_BCH:
+        if Amount<MIN_BCH_ENTRY:
+            min_value_error()
+        elif Amount>=MIN_BCH_ENTRY:
+            if currency_type == "INR":
                 Value = Amount *float(CURRENT_INR_BCH)
-        elif currency_type == "DOLLARS":
-            if Amount<MIN_DOLLAR_BCH:
-                min_value_error()
-            elif Amount>=MIN_DOLLAR_BCH:
+            elif currency_type == "DOLLARS":
                 Value = Amount * float(CURRENT_DOLLAR_BCH)
-        elif currency_type == "EUROS":
-            if Amount<MIN_EURO_BCH:
-                min_value_error()
-            elif Amount>=MIN_EURO_BCH:
+            elif currency_type == "EUROS":
                 Value = Amount * float(CURRENT_EURO_BCH)
-
+        
     elif cryptype == "ETH":
-        if currency_type == "INR":
-            if Amount < MIN_INR_ETH:
-                min_value_error()
-            elif Amount >= MIN_INR_ETH:
-                Value = Amount * float(CURRENT_INR_ETH)
-        elif currency_type == "DOLLARS":
-            if Amount < MIN_DOLLAR_ETH:
-                min_value_error()
-            elif Amount >= MIN_DOLLAR_ETH:
+        if Amount<MIN_ETH_ENTRY:
+            min_value_error()
+        elif Amount>=MIN_ETH_ENTRY:
+            if currency_type == "INR":
+                Value = Amount *float(CURRENT_INR_ETH)
+            elif currency_type == "DOLLARS":
                 Value = Amount * float(CURRENT_DOLLAR_ETH)
-        elif currency_type == "EUROS":
-            if Amount < MIN_EURO_ETH:
-                min_value_error()
-            elif Amount >= MIN_EURO_ETH:
+            elif currency_type == "EUROS":
                 Value = Amount * float(CURRENT_EURO_ETH)
-
+        
     elif cryptype == "LIT":
-        if currency_type == "INR":
-            if Amount < MIN_INR_LIT:
-                min_value_error()
-            elif Amount >= MIN_INR_LIT:
-                Value = Amount * float(CURRENT_INR_LIT)
-        elif currency_type == "DOLLARS":
-            if Amount < MIN_DOLLAR_LIT:
-                min_value_error()
-            elif Amount >= MIN_DOLLAR_LIT:
+        if Amount<MIN_LIT_ENTRY:
+            min_value_error()
+        elif Amount>=MIN_LIT_ENTRY:
+            if currency_type == "INR":
+                Value = Amount *float(CURRENT_INR_LIT)
+            elif currency_type == "DOLLARS":
                 Value = Amount * float(CURRENT_DOLLAR_LIT)
-        elif currency_type == "EUROS":
-            if Amount < MIN_EURO_LIT:
-                min_value_error()
-            elif Amount >= MIN_EURO_LIT:
+            elif currency_type == "EUROS":
                 Value = Amount * float(CURRENT_EURO_LIT)
-
+        
     value.set(round(Value, 2))
 
 
