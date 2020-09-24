@@ -2,13 +2,14 @@ from tkinter import *
 from PIL import ImageTk, Image
 from tkinter import ttk
 from math import *
+#import mysql.connector as mc
 
 root = Tk()
 root.title("cryptocurrency")
 root.geometry("1000x650")
 root.resizable(0,0)
 
-#IMG = ImageTk.PhotoImage(Image.open("cryptocurrency.jpeg"))
+IMG = ImageTk.PhotoImage(Image.open("cryptocurrency.jpeg"))
 
 CRYPTYPE = ["BTC", "BCH", "LIT", "ETH"]
 
@@ -67,11 +68,11 @@ def frame1():
     frame1 = Frame(root).place(x=0, y=0, width=1000, height=650)
     # labels
     title_label = Label(frame1, text="CRYPTOCURRENCY", font=("TimesNewRoman 40")).place(x=200, y=5, width=600, height=52)
-    #image_label = Label(frame1, image=IMG).place(x=0, y=91)
+    image_label = Label(frame1, image=IMG).place(x=0, y=91)
     cryptype_label = Label(frame1, text="CRYPTYPE", font=("TimesNewRoman 15 bold")).place(x=100, y=480, width=137, height=31)
-    cryptype_label = Label(frame1,text="CURRENCY TYPE",font=("TimesNewRoman 15 bold")).place(x=319, y=480, width=223, height=31)
-    cryptype_label = Label(frame1, text="AMOUNT", font=("TimesNewRoman 15 bold")).place(x=618, y=480, width=112, height=31)
-    cryptype_label = Label(frame1, text="VALUE", font=("TimesNewRoman 15 bold")).place(x=813, y=480, width=87, height=31)
+    currency_type_label = Label(frame1,text="CURRENCY TYPE",font=("TimesNewRoman 15 bold")).place(x=319, y=480, width=223, height=31)
+    coins_label = Label(frame1, text="COINS", font=("TimesNewRoman 15 bold")).place(x=612, y=480, width=112, height=31)
+    amount_label = Label(frame1, text="AMOUNT", font=("TimesNewRoman 15 bold")).place(x=823, y=480, width=87, height=31)
 
     # dropdown menu
     cryptype_menu = ttk.Combobox(frame1, values=CRYPTYPE)
@@ -89,6 +90,7 @@ def frame1():
     signup_button = Button(frame1, text="SIGN UP", command=lambda: show_frame(frame2)).place(x=804, y=9, width=82, height=30)
     signin_button = Button(frame1, text="SIGN IN", command=lambda:show_frame(frame3)).place(x=895, y=9, width=82, height=30)
     value_button = Button(frame1, text="GET", command=calculation).place(x=823, y=535, width=83)
+    #database()
 
 def min_value_error():
     error_window=Toplevel()
@@ -109,7 +111,7 @@ MINIMUM ETH(EURO)=32.71
 
 MINIMUM LIT(INR)=712.08
 MINIMUM LIT(DOLLAR)=9.68
-MINIMUM LIT(EURO)=8.29''', font="TimesNewRoman 9").place(x=155, y=100) 
+MINIMUM LIT(EURO)=8.29''', font="TimesNewRoman 9").place(x=155, y=100)
 
 def calculation():
     cryptype = cryptype_menu.get()
@@ -117,7 +119,7 @@ def calculation():
 
     Amount = amount.get()
     Value=0
-    
+
     if cryptype == "BTC":
         if currency_type == "INR":
             if Amount<MIN_INR_BTC:
@@ -185,7 +187,7 @@ def calculation():
                 min_value_error()
             elif Amount >= MIN_EURO_LIT:
                 Value = Amount * float(CURRENT_EURO_LIT)
-    
+
     value.set(round(Value, 2))
 
 
@@ -310,7 +312,13 @@ def frame4():
     recieve_button = Button(frame4, text="RECIEVE").place(x=150, y=250, width=100, height=35)
 
     data_table()
-    
+
+# def database():
+#     db = mc.connect(
+#         host="localhost",
+#         user="root",
+#         passwd="Dmars@4321"
+#         )
 
 frame1()
 
