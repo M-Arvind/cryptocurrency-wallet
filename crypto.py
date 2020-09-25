@@ -2,7 +2,7 @@ from tkinter import *
 from PIL import ImageTk, Image
 from tkinter import ttk
 from math import *
-#import mysql.connector as mc
+import mysql.connector as mc
 
 root = Tk()
 root.title("cryptocurrency")
@@ -135,7 +135,7 @@ def calculation():
                 Value = Amount * float(CURRENT_DOLLAR_BCH)
             elif currency_type == "EUROS":
                 Value = Amount * float(CURRENT_EURO_BCH)
-        
+
     elif cryptype == "ETH":
         if Amount<MIN_ETH_ENTRY:
             min_value_error()
@@ -146,7 +146,7 @@ def calculation():
                 Value = Amount * float(CURRENT_DOLLAR_ETH)
             elif currency_type == "EUROS":
                 Value = Amount * float(CURRENT_EURO_ETH)
-        
+
     elif cryptype == "LIT":
         if Amount<MIN_LIT_ENTRY:
             min_value_error()
@@ -157,7 +157,7 @@ def calculation():
                 Value = Amount * float(CURRENT_DOLLAR_LIT)
             elif currency_type == "EUROS":
                 Value = Amount * float(CURRENT_EURO_LIT)
-        
+
     value.set(round(Value, 2))
 
 
@@ -283,12 +283,13 @@ def frame4():
 
     data_table()
 
-# def database():
-#     db = mc.connect(
-#         host="localhost",
-#         user="root",
-#         passwd="Dmars@4321"
-#         )
+def database():
+    db = mc.connect(
+        host="localhost",
+        user="root",
+        passwd="arvind",
+        database="cryptocurrency"
+        )
 
 frame1()
 
