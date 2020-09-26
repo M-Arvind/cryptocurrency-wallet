@@ -2,7 +2,7 @@ from tkinter import *
 from PIL import ImageTk, Image
 from tkinter import ttk
 from math import *
-import mysql.connector as mc
+#import mysql.connector as mc
 
 root = Tk()
 root.title("cryptocurrency")
@@ -107,6 +107,17 @@ MINIMUM BCH- 0.05
 MINIMUM LIT- 0.2
 MINIMUM ETH- 0.1''', font="TimesNewRoman 11").place(x=175, y=100)
 
+def logout():
+    global confirm_logout
+    confirm_logout = Toplevel()
+    confirm_logout.geometry("300x200+440+300")
+    confirm_logout_label= Label(confirm_logout, text="ARE YOU SURE YOU WANT TO LOGOUT?").place(x=42, y=50)
+    confirm_logout_button= Button(confirm_logout, text="Logout", command=logout_destroy).place(x=130, y=100)
+
+def logout_destroy():
+    show_frame(frame1)
+    confirm_logout.destroy()
+    
 def calculation():
     cryptype = cryptype_menu.get()
     currency_type = currencytype_menu.get()
@@ -135,7 +146,7 @@ def calculation():
                 Value = Amount * float(CURRENT_DOLLAR_BCH)
             elif currency_type == "EUROS":
                 Value = Amount * float(CURRENT_EURO_BCH)
-
+        
     elif cryptype == "ETH":
         if Amount<MIN_ETH_ENTRY:
             min_value_error()
@@ -146,7 +157,7 @@ def calculation():
                 Value = Amount * float(CURRENT_DOLLAR_ETH)
             elif currency_type == "EUROS":
                 Value = Amount * float(CURRENT_EURO_ETH)
-
+        
     elif cryptype == "LIT":
         if Amount<MIN_LIT_ENTRY:
             min_value_error()
@@ -157,7 +168,7 @@ def calculation():
                 Value = Amount * float(CURRENT_DOLLAR_LIT)
             elif currency_type == "EUROS":
                 Value = Amount * float(CURRENT_EURO_LIT)
-
+        
     value.set(round(Value, 2))
 
 
@@ -280,16 +291,16 @@ def frame4():
 
     send_button = Button(frame4, text="SEND").place(x=20, y=250, width=100, height=35)
     recieve_button = Button(frame4, text="RECIEVE").place(x=150, y=250, width=100, height=35)
+    logout_button = Button(frame4, text= "LOG OUT", command= logout).place(x=880, y=10, width=90, height=30)
 
     data_table()
 
-def database():
-    db = mc.connect(
-        host="localhost",
-        user="root",
-        passwd="arvind",
-        database="cryptocurrency"
-        )
+# def database():
+#     db = mc.connect(
+#         host="localhost",
+#         user="root",
+#         passwd="Dmars@4321"
+#         )
 
 frame1()
 
