@@ -2,7 +2,7 @@ from tkinter import *
 from PIL import ImageTk, Image
 from tkinter import ttk
 from math import *
-#import mysql.connector as mc
+import mysql.connector as mc
 
 root = Tk()
 root.title("cryptocurrency")
@@ -95,7 +95,7 @@ def frame1():
     signup_button = Button(frame1, text="SIGN UP", command=lambda: show_frame(frame2)).place(x=804, y=9, width=82, height=30)
     signin_button = Button(frame1, text="SIGN IN", command=lambda:show_frame(frame3)).place(x=895, y=9, width=82, height=30)
     value_button = Button(frame1, text="GET", command=calculation).place(x=823, y=535, width=83)
-    #database()
+
 
 def min_value_error():
     error_window=Toplevel()
@@ -117,7 +117,7 @@ def logout():
 def logout_destroy():
     show_frame(frame1)
     confirm_logout.destroy()
-    
+
 def calculation():
     cryptype = cryptype_menu.get()
     currency_type = currencytype_menu.get()
@@ -146,7 +146,7 @@ def calculation():
                 Value = Amount * float(CURRENT_DOLLAR_BCH)
             elif currency_type == "EUROS":
                 Value = Amount * float(CURRENT_EURO_BCH)
-        
+
     elif cryptype == "ETH":
         if Amount<MIN_ETH_ENTRY:
             min_value_error()
@@ -157,7 +157,7 @@ def calculation():
                 Value = Amount * float(CURRENT_DOLLAR_ETH)
             elif currency_type == "EUROS":
                 Value = Amount * float(CURRENT_EURO_ETH)
-        
+
     elif cryptype == "LIT":
         if Amount<MIN_LIT_ENTRY:
             min_value_error()
@@ -168,8 +168,9 @@ def calculation():
                 Value = Amount * float(CURRENT_DOLLAR_LIT)
             elif currency_type == "EUROS":
                 Value = Amount * float(CURRENT_EURO_LIT)
-        
+
     value.set(round(Value, 2))
+
 
 
 
@@ -194,7 +195,7 @@ def frame2():
     back_button = Button(frame2, text="<--", command=lambda: show_frame(frame1)).place(x=10, y=10, width=40, height=30)
 
 def frame3():
-    global frame3
+
     frame3 = Frame(root).place(x=0, y=0, width=1000, height=650)
     #labels
 
@@ -224,8 +225,10 @@ def CA_popup():
 
     CA_popup_button = Button(CA_popup, text="OK", command=signup_destroy).place(x= 130,y=130, height=25, width=100)
 
+
+
 def signup_destroy():
-    CA_popup.destroy()
+    #CA_popup.()
     show_frame(frame1)
 
 def show_frame(frame):
@@ -295,14 +298,37 @@ def frame4():
 
     data_table()
 
-# def database():
-#     db = mc.connect(
-#         host="localhost",
-#         user="root",
-#         passwd="Dmars@4321"
-#         )
+def database():
+    db = mc.connect(
+        host="localhost",
+        user="root",
+        passwd="arvind",
+
+        )
+    cursor = db.cursor()
+
+    cursor.execute("CREATE DATABASE IF NOT EXISTS crypto_wallet ")
+
+    cursor.execute("use crypto_wallet")
+
+    cursor.execute("""CREATE TABLE  IF NOT EXISTS crypto
+            (username varchar(50),
+             password varchar(50),
+             Email varchar(50),
+             Publickey varchar(100),
+             privatekey varchar(100),
+             BTC float(10),
+             BCH float(10),
+             LIT float(10),
+             ETH float(10)
+             )
+            """)
+    cursor.close()
+
 
 frame1()
+database()
+
 
 root.mainloop()
 
