@@ -42,6 +42,11 @@ MIN_BCH_ENTRY=0.05
 MIN_LIT_ENTRY=0.2
 MIN_ETH_ENTRY=0.1
 
+btc_value=0.00
+bch_value=0.00
+lit_value=0.00
+eth_value=0.00
+
 ##MIN_INR_BTC=1613.18
 ##MIN_DOLLAR_BTC=21.93
 ##MIN_EURO_BTC=18.77
@@ -95,7 +100,7 @@ def frame1():
     # Buttons
 
     signup_button = Button(frame1, text="SIGN UP", command=lambda: show_frame(frame2)).place(x=804, y=9, width=82, height=30)
-    signin_button = Button(frame1, text="SIGN IN", command=lambda:show_frame(frame3)).place(x=884, y=9, width=82, height=30)
+    signin_button = Button(frame1, text="SIGN IN", command=lambda:show_frame(Frame3)).place(x=884, y=9, width=82, height=30)
     value_button = Button(frame1, text="GET", command=calculation).place(x=823, y=535, width=83)
 
 
@@ -195,33 +200,36 @@ def create_wallet():
     username = name.get()
     password = passwd.get()
     email = mail.get()
-    c_password = passwd2.get()
-    if password != c_password:
-        messagebox.showerror("ERROR", "passwords do not match")
+    c_password = cpasswd.get()
+    if len(password) < 8 or password.isalpha() or password.isdigit():
+        messagebox.showerror("ERROR", "Min. length should be 8 characters and must be alphanumeric.")
     else:
-        # random_string = username + password + email
+        if password != c_password:
+            messagebox.showerror("ERROR", "passwords do not match")
+        else:
+            # random_string = username + password + email
 
-        public_key  = None
-        private_key = None
-        db = mc.connect(
-        host="localhost",
-        user="root",
-        passwd="arvind",
-        database="crypto_wallet"
-        )
+            public_key  = None
+            private_key = None
+            db = mc.connect(
+            host="localhost",
+            user="root",
+            passwd="arvind",
+            database="crypto_wallet"
+            )
 
-        cursor = db.cursor()
+            cursor = db.cursor()
 
-        query = """INSERT INTO crypto (username , password, Email, Publickey, privatekey, BTC, BCH, LIT, ETH) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+            query = """INSERT INTO crypto (username , password, Email, Publickey, privatekey, BTC, BCH, LIT, ETH) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"""
 
-        values_tuple = (username , password, email, public_key, private_key, 0.0, 0.0, 0.0, 0.0)
+            values_tuple = (username , password, email, public_key, private_key, 0.0, 0.0, 0.0, 0.0)
 
-        cursor.execute(query, values_tuple)
+            cursor.execute(query, values_tuple)
 
-        db.commit()
+            db.commit()
 
-        messagebox.showinfo("success", "account created successfully....")
-        show_frame(frame1)
+            messagebox.showinfo("success", "account created successfully....")
+            show_frame(frame1)
 
 
 
@@ -229,46 +237,87 @@ def frame2():
     global name
     global mail
     global passwd
-    global passwd2
+    global cpasswd
     name = StringVar()
     mail = StringVar()
     passwd = StringVar()
-    passwd2 = StringVar()
+    cpasswd = StringVar()
     frame2 = Frame(root, bg="#FFFFFF").place(x=0, y=0, width=1000, height=650)
     # labels
     username_label = Label(frame2, text="USERNAME", font=("TimesNewRoman 10 bold"), bg="#FFFFFF").place(x=236, y=224, width=245, height=37)
     email_label = Label(frame2, text="EMAIL", font=("TimesNewRoman 10 bold"), bg="#FFFFFF").place(x=220, y=267, width=245, height=37)
     password_label = Label(frame2, text="PASSWORD", font=("TimesNewRoman 10 bold"), bg="#FFFFFF").place(x=238, y=310, width=245, height=37)
     confirm_password_label = Label(frame2, text="CONFIRM PASSWORD", font=("TimesNewRoman 10 bold"), bg="#FFFFFF").place(x=269, y=353, width=245, height=37)
-
     # entrys
 
     username_entry = Entry(frame2, textvariable=name, bg="#FFFFFF").place(x=550, y=230, width=170, height=20)
     email_entry = Entry(frame2, textvariable=mail, bg="#FFFFFF").place(x=550, y=270, width=170, height=20)
     password_entry = Entry(frame2, textvariable=passwd, bg="#FFFFFF").place(x=550, y=315, width=170, height=20)
-    confirm_password_entry = Entry(frame2, textvariable=passwd2, bg="#FFFFFF").place(x=550, y=361, width=170, height=20)
+    confirm_password_entry = Entry(frame2, textvariable=cpasswd, bg="#FFFFFF").place(x=550, y=361, width=170, height=20)
 
     # buttons
 
     create_account_button = Button(frame2, text="CREATE ACCOUNT", command=create_wallet).place(x=450, y=422, width=150, height=35)
     back_button = Button(frame2, text="<--", command=lambda: show_frame(frame1)).place(x=10, y=10, width=40, height=30)
 
-def frame3():
+def signing_in():
+    global table_username
+    username = name2.get()
+    password = passwd2.get()
 
-    frame3 = Frame(root).place(x=0, y=0, width=1000, height=650)
+    db = mc.connect(
+        host="localhost",
+        user="root",
+        passwd="arvind",
+        database="crypto_wallet"
+        )
+
+    cursor = db.cursor()
+
+    query = """SELECT * FROM crypto WHERE username = %s"""
+    cursor.execute(query, (username, ))
+
+    record = cursor.fetchall()
+
+    table_username = record[0][0]
+
+    if record == []:
+        messagebox.showerror("ERROR", "Username not found!")
+    else:
+        if record[0][1] == password:
+            show_frame(frame4)
+        else:
+            messagebox.showerror("ERROR", "Password does not match!")
+
+
+
+
+
+
+
+
+def Frame3():
+    global name2
+    global passwd2
+    global frame3
+
+    name2 = StringVar()
+    passwd2 = StringVar()
+
+    frame3 = Frame(root, bg="#FFFFFF").place(x=0, y=0, width=1000, height=650)
     #labels
 
-    username_label = Label(frame3, text="USERNAME", font=("TimesNewRoman 12 bold")).place(x=300, y=285, width=245, height=37)
-    password_label = Label(frame3, text="PASSWORD", font=("TimesNewRoman 12 bold")).place(x=300, y=325, width=245, height=37)
+    username_label = Label(frame3, text="USERNAME", font=("TimesNewRoman 12 bold"), bg="#FFFFFF").place(x=300, y=285, width=245, height=37)
+    password_label = Label(frame3, text="PASSWORD", font=("TimesNewRoman 12 bold"), bg="#FFFFFF").place(x=300, y=325, width=245, height=37)
 
     #entrys
 
-    username_entry = Entry(frame3).place(x=499, y=293, width=170, height=20)
-    password_entry = Entry(frame3).place(x=500, y=332, width=170, height=20)
+    username_entry = Entry(frame3, bg="#FFFFFF", textvariable=name2).place(x=499, y=293, width=170, height=20)
+    password_entry = Entry(frame3, bg="#FFFFFF", textvariable=passwd2).place(x=500, y=332, width=170, height=20)
 
     #buttons
 
-    signin_button = Button(frame3, text="SIGN IN", command=lambda: show_frame(frame4)).place(x=540, y= 380, width=120, height=30)
+    signin_button = Button(frame3, text="SIGN IN", command=signing_in).place(x=540, y= 380, width=120, height=30)
     forget_password_button = Button(frame3, text="FORGOT PASSWORD").place(x=380, y= 382, width=140, height=28)
 
     back_button = Button(frame3, text="<--", command=lambda: show_frame(frame1)).place(x=10, y=10, width=40, height=30)
@@ -311,20 +360,11 @@ def data_table():
     My_tree.place(x= 190, y= 400)
 
 def frame4():
-    global btc_value
-    global bch_value
-    global lit_value
-    global eth_value
-
-    btc_value=0.00
-    bch_value=0.00
-    lit_value=0.00
-    eth_value=0.00
 
     global frame4
     frame4 = Frame(root).place(x=0, y=0, width=1000, height=650)
 
-    username_label= Label(frame4, text="PROJECT", font=("TimesNewRoman 30 bold")).place(x=15, y=15, height=40, width=200)
+    username_label= Label(frame4, text=table_username, font=("TimesNewRoman 30 bold")).place(x=15, y=15, height=40, width=200)
     btc_label =Label(frame4, text="BTC", font=("TimesNewRoman 15 bold")).place(x=20, y=120, height=40, width=50)
     bch_label =Label(frame4, text="BCH", font=("TimesNewRoman 15 bold")).place(x=140, y=120, height=40, width=50)
     lit_label =Label(frame4, text="LIT", font=("TimesNewRoman 15 bold")).place(x=260, y=120, height=40, width=50)
