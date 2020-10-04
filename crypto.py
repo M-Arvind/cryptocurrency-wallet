@@ -68,7 +68,7 @@ eth_value=0.00
 
 # mainwindow of the application
 def frame1():
-    # sign_up_img = ImageTk.PhotoImage(Image.open("signup png.png"))
+
     global cryptype_menu
     global currencytype_menu
     global amount_entry
@@ -88,6 +88,7 @@ def frame1():
     currency_type_label = Label(frame1,text="CURRENCY TYPE",font=("TimesNewRoman 15 bold"), bg="#FFFFFF").place(x=319, y=480, width=223, height=31)
     coins_label = Label(frame1, text="COINS", font=("TimesNewRoman 15 bold"), bg="#FFFFFF").place(x=612, y=480, width=112, height=31)
     amount_label = Label(frame1, text="AMOUNT", font=("TimesNewRoman 15 bold"), bg="#FFFFFF").place(x=823, y=480, width=87, height=31)
+
     # dropdown menu
     cryptype_menu = ttk.Combobox(frame1, values=CRYPTYPE)
     cryptype_menu.place(x=115, y=515, width=108)
