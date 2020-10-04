@@ -4,13 +4,16 @@ from tkinter import ttk
 from math import *
 from tkinter import messagebox
 import mysql.connector as mc
+from tkinter import font
+
 
 root = Tk()
 root.title("cryptocurrency")
-root.geometry("1000x650")
-root.resizable(0,0)
+root.geometry("1000x650+250+120")
 
 IMG = ImageTk.PhotoImage(Image.open("Cryptocurrency_logos.jpg"))
+FRAME_IMG = ImageTk.PhotoImage(Image.open("frame_img2.jpg"))
+
 
 CRYPTYPE = ["BTC", "BCH", "LIT", "ETH"]
 
@@ -115,15 +118,9 @@ MINIMUM LIT- 0.2
 MINIMUM ETH- 0.1''', font="TimesNewRoman 11").place(x=175, y=100)
 
 def logout():
-    global confirm_logout
-    confirm_logout = Toplevel()
-    confirm_logout.geometry("300x200+440+300")
-    confirm_logout_label= Label(confirm_logout, text="ARE YOU SURE YOU WANT TO LOGOUT?").place(x=42, y=50)
-    confirm_logout_button= Button(confirm_logout, text="Logout", command=logout_destroy).place(x=130, y=100)
-
-def logout_destroy():
-    show_frame(frame1)
-    confirm_logout.destroy()
+    message = messagebox.askyesno("logout", "Are you sure?")
+    if message == True:
+        show_frame(frame1)
 
 def calculation():
     cryptype = cryptype_menu.get()
@@ -201,35 +198,47 @@ def create_wallet():
     password = passwd.get()
     email = mail.get()
     c_password = cpasswd.get()
-    if len(password) < 8 or password.isalpha() or password.isdigit():
-        messagebox.showerror("ERROR", "Min. length should be 8 characters and must be alphanumeric.")
-    else:
-        if password != c_password:
-            messagebox.showerror("ERROR", "passwords do not match")
-        else:
-            # random_string = username + password + email
-
-            public_key  = None
-            private_key = None
-            db = mc.connect(
+    db = mc.connect(
             host="localhost",
             user="root",
             passwd="arvind",
             database="crypto_wallet"
             )
+    cursor = db.cursor()
 
-            cursor = db.cursor()
+    query = """SELECT * FROM crypto WHERE username = %s"""
 
-            query = """INSERT INTO crypto (username , password, Email, Publickey, privatekey, BTC, BCH, LIT, ETH) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+    cursor.execute(query, (username, ))
 
-            values_tuple = (username , password, email, public_key, private_key, 0.0, 0.0, 0.0, 0.0)
+    record = cursor.fetchall()
 
-            cursor.execute(query, values_tuple)
+    if record == []:
 
-            db.commit()
 
-            messagebox.showinfo("success", "account created successfully....")
-            show_frame(frame1)
+        if len(password) < 8 or password.isalpha() or password.isdigit():
+            messagebox.showerror("ERROR", "Min. length should be 8 characters and must be alphanumeric.")
+        else:
+            if password != c_password:
+                messagebox.showerror("ERROR", "passwords do not match")
+            else:
+                # random_string = username + password + email
+
+                public_key  = None
+                private_key = None
+
+                query = """INSERT INTO crypto (username , password, Email, Publickey, privatekey, BTC, BCH, LIT, ETH) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+
+                values_tuple = (username , password, email, public_key, private_key, 0.0, 0.0, 0.0, 0.0)
+
+                cursor.execute(query, values_tuple)
+
+                db.commit()
+
+                messagebox.showinfo("success", "account created successfully....")
+                show_frame(frame1)
+
+    else:
+        messagebox.showerror("ERROR", "Username already exists!")
 
 
 
@@ -238,12 +247,14 @@ def frame2():
     global mail
     global passwd
     global cpasswd
+    global username_entry
     name = StringVar()
     mail = StringVar()
     passwd = StringVar()
     cpasswd = StringVar()
     frame2 = Frame(root, bg="#FFFFFF").place(x=0, y=0, width=1000, height=650)
     # labels
+    bg_label = Label(frame2, image=FRAME_IMG).place(x=0, y=0)
     username_label = Label(frame2, text="USERNAME", font=("TimesNewRoman 10 bold"), bg="#FFFFFF").place(x=236, y=224, width=245, height=37)
     email_label = Label(frame2, text="EMAIL", font=("TimesNewRoman 10 bold"), bg="#FFFFFF").place(x=220, y=267, width=245, height=37)
     password_label = Label(frame2, text="PASSWORD", font=("TimesNewRoman 10 bold"), bg="#FFFFFF").place(x=238, y=310, width=245, height=37)
@@ -264,7 +275,6 @@ def signing_in():
     global table_username
     username = name2.get()
     password = passwd2.get()
-
     db = mc.connect(
         host="localhost",
         user="root",
@@ -279,18 +289,14 @@ def signing_in():
 
     record = cursor.fetchall()
 
-    table_username = record[0][0]
-
     if record == []:
         messagebox.showerror("ERROR", "Username not found!")
     else:
+        table_username = record[0][0]
         if record[0][1] == password:
-            show_frame(frame4)
+            show_frame(Frame4)
         else:
-            messagebox.showerror("ERROR", "Password does not match!")
-
-
-
+            messagebox.showerror("ERROR", "Incorrect password.")
 
 
 
@@ -307,6 +313,7 @@ def Frame3():
     frame3 = Frame(root, bg="#FFFFFF").place(x=0, y=0, width=1000, height=650)
     #labels
 
+    bg_label = Label(frame3, image=FRAME_IMG).place(x=0, y=0)
     username_label = Label(frame3, text="USERNAME", font=("TimesNewRoman 12 bold"), bg="#FFFFFF").place(x=300, y=285, width=245, height=37)
     password_label = Label(frame3, text="PASSWORD", font=("TimesNewRoman 12 bold"), bg="#FFFFFF").place(x=300, y=325, width=245, height=37)
 
@@ -329,16 +336,35 @@ def show_frame(frame):
 def data_table():
 
 
+    style= ttk.Style()
+    style.theme_use("alt")
+    style.configure("Treeview", rowheight=29, fieldbackground="white")
+    style.configure("Treeview", font=("ComicSansMS",9,"bold"))
+    style.configure("Treeview.Heading", font =("ComicSansMS",10,"bold"))
+
+    style.map("Treeview", background=[("selected", 'lightblue')])
+
+
+
+
     My_tree = ttk.Treeview(frame4)
+    My_tree2 = ttk.Treeview(frame4)
 
     My_tree['columns'] = ("BTC", "BCH", "LIT", "ETH")
+    My_tree2['columns'] = ("From", "To", "Amount")
+
 
     #formating the column
-    My_tree.column("#0", width = 120)
-    My_tree.column("BTC", width = 120)
-    My_tree.column("BCH", width = 120)
-    My_tree.column("LIT", width = 120)
-    My_tree.column("ETH", width = 120)
+    My_tree.column("#0", width = 92)
+    My_tree.column("BTC", width = 92)
+    My_tree.column("BCH", width = 92)
+    My_tree.column("LIT", width = 92)
+    My_tree.column("ETH", width = 92)
+
+    My_tree2.column("#0", width = 115)
+    My_tree2.column("From", width = 115)
+    My_tree2.column("To", width = 115)
+    My_tree2.column("Amount", width = 116)
 
     #HEADING
     My_tree.heading("#0", text="CURRENCY", anchor=W)
@@ -347,37 +373,129 @@ def data_table():
     My_tree.heading("LIT", text="LIT", anchor=W)
     My_tree.heading("ETH", text="ETH", anchor=W)
 
+    My_tree2.heading("#0", text="ID", anchor=W)
+    My_tree2.heading("From", text="From", anchor=W)
+    My_tree2.heading("To", text="To", anchor=W)
+    My_tree2.heading("Amount", text="Amount", anchor=W)
+
     #INSERTING DATA
-    My_tree.insert(parent="", index='end', iid=0, text="", values=())
-    My_tree.insert(parent="", index='end', iid=1, text="INR", values=(CURRENT_INR_BTC, CURRENT_INR_BCH, CURRENT_INR_LIT, CURRENT_INR_ETH))
-    My_tree.insert(parent="", index='end', iid=2, text="", values=())
-    My_tree.insert(parent="", index='end', iid=3, text="EUROS", values=(CURRENT_EURO_BTC, CURRENT_EURO_BCH, CURRENT_EURO_LIT, CURRENT_EURO_ETH))
-    My_tree.insert(parent="", index='end', iid=4, text="", values=())
-    My_tree.insert(parent="", index='end', iid=5, text="DOLLARS", values=(CURRENT_DOLLAR_BTC, CURRENT_DOLLAR_BCH, CURRENT_DOLLAR_LIT, CURRENT_DOLLAR_ETH))
-    My_tree.insert(parent="", index='end', iid=6, text="", values=())
+    My_tree.insert(parent="", index='end', iid=0, text="", values=(), tags=("odd",))
+    My_tree.insert(parent="", index='end', iid=1, text="INR", values=(CURRENT_INR_BTC, CURRENT_INR_BCH, CURRENT_INR_LIT, CURRENT_INR_ETH), tags=("even",))
+    My_tree.insert(parent="", index='end', iid=2, text="", values=(), tags=("odd",))
+    My_tree.insert(parent="", index='end', iid=3, text="EUROS", values=(CURRENT_EURO_BTC, CURRENT_EURO_BCH, CURRENT_EURO_LIT, CURRENT_EURO_ETH), tags=("even",))
+    My_tree.insert(parent="", index='end', iid=4, text="", values=(), tags=("odd",))
+    My_tree.insert(parent="", index='end', iid=5, text="DOLLARS", values=(CURRENT_DOLLAR_BTC, CURRENT_DOLLAR_BCH, CURRENT_DOLLAR_LIT, CURRENT_DOLLAR_ETH), tags=("even",))
 
+    My_tree.tag_configure('odd', background="white")
+    My_tree.tag_configure('even', background="#8FA2A3")
 
-    My_tree.place(x= 190, y= 400)
+    My_tree.place(x= 6, y= 435)
+    My_tree2.place(x= 5, y=115)
 
-def frame4():
+def send():
+    value = option.get()
+    reciever_address = to.get()
+    amount = coins_amount.get()
+    sender = name2.get()
+
+    db = mc.connect(
+        host="localhost",
+        user="root",
+        passwd="arvind",
+        database="crypto_wallet"
+        )
+
+    cursor = db.cursor()
+
+    query = """SELECT * FROM crypto WHERE address = %s"""
+    cursor.execute(query, (reciever_address, ))
+
+    record = cursor.fetchall()
+
+def Frame4():
 
     global frame4
-    frame4 = Frame(root).place(x=0, y=0, width=1000, height=650)
+    global to
+    global coins_amount
+    global option
+    frame4 = Frame(root, bg="#FFFFFF").place(x=0, y=0, width=1000, height=650)
 
-    username_label= Label(frame4, text=table_username, font=("TimesNewRoman 30 bold")).place(x=15, y=15, height=40, width=200)
-    btc_label =Label(frame4, text="BTC", font=("TimesNewRoman 15 bold")).place(x=20, y=120, height=40, width=50)
-    bch_label =Label(frame4, text="BCH", font=("TimesNewRoman 15 bold")).place(x=140, y=120, height=40, width=50)
-    lit_label =Label(frame4, text="LIT", font=("TimesNewRoman 15 bold")).place(x=260, y=120, height=40, width=50)
-    eth_label =Label(frame4, text="ETH", font=("TimesNewRoman 15 bold")).place(x=380, y=120, height=40, width=50)
+    to = StringVar()
+    coins_amount = StringVar()
+    option = StringVar()
 
-    btc_value_label=Label(frame4, text=btc_value, font=("TimesNewRoman 15 bold")).place(x=20, y=160, height=40, width=50)
-    bch_value_label=Label(frame4, text=bch_value, font=("TimesNewRoman 15 bold")).place(x=140, y=160, height=40, width=50)
-    lit_value_label=Label(frame4, text=lit_value, font=("TimesNewRoman 15 bold")).place(x=260, y=160, height=40, width=50)
-    eth_value_label=Label(frame4, text=eth_value, font=("TimesNewRoman 15 bold")).place(x=380, y=160, height=40, width=50)
+    btc_balance = btc_value * CURRENT_INR_BTC
+    bch_balance = bch_value * CURRENT_INR_BCH
+    lit_balance = lit_value * CURRENT_INR_LIT
+    eth_balance = eth_value * CURRENT_INR_ETH
 
-    send_button = Button(frame4, text="SEND").place(x=20, y=250, width=100, height=35)
-    recieve_button = Button(frame4, text="RECIEVE").place(x=150, y=250, width=100, height=35)
-    logout_button = Button(frame4, text= "LOG OUT", command= logout).place(x=880, y=10, width=90, height=30)
+    btc_image = ImageTk.PhotoImage(Image.open("btc_icon.png"))
+    bch_image = ImageTk.PhotoImage(Image.open("bch_icon.png"))
+    lit_image = ImageTk.PhotoImage(Image.open("lit_icon.png"))
+    eth_image = ImageTk.PhotoImage(Image.open("eth_icon.png"))
+
+
+    my_font = font.Font(family="Comic Sans MS", size=30)
+    my_font2 = font.Font(family="Comic Sans MS", size=20)
+    my_font3 = font.Font(family="Comic Sans MS", size=10)
+
+    coins_frame = LabelFrame(frame4, text= "Mycoins",bg="#FFFFFF", font=("ComicSansMS 15"), labelanchor="n").place(x=480, y=80, width=500, height= 350)
+    mytree_frame = LabelFrame(frame4, text="My Transfer", bg="#FFFFFF", font=("ComicSansMS 15"), labelanchor="n").place(x=5, y=80, width=465, height= 349)
+    transfer_frame = LabelFrame(frame4, text="Transaction", bg="#FFFFFF", font=("ComicSansMS 15"), labelanchor="n").place(x=480, y=440, width=500, height= 160)
+
+    header_label = Label(frame4, bg="#8FA2A3").place(x=0, y=0, width= 1000, height = 70)
+
+    username_label= Label(frame4, text=table_username, font=my_font, bg="#8FA2A3", fg="white").place(x=800, y=15, height=40, width=200)
+    To_label = Label(frame4, text = "TO", font=("ComicSansMS 12 bold"), bg="#FFFFFF").place(x=490, y=470, width= 30, height= 30)
+    amount = Label(frame4, text = "AMOUNT", font=("ComicSansMS 12 bold"), bg="#FFFFFF").place(x=495, y=520, width= 70, height= 30)
+    btc_label =Label(frame4, text="BTC", font=my_font3, bg="#FFFFFF").place(x=585, y=138, height=40, width=50)
+    bch_label =Label(frame4, text="BCH", font=my_font3, bg="#FFFFFF").place(x=585, y=220, height=40, width=50)
+    lit_label =Label(frame4, text="LIT", font=my_font3, bg="#FFFFFF").place(x=585, y=300, height=40, width=50)
+    eth_label =Label(frame4, text="ETH", font=my_font3, bg="#FFFFFF").place(x=586, y=380, height=40, width=50)
+
+    btc_value_label=Label(frame4, text=btc_value, font=my_font3, bg="#FFFFFF").place(x=553, y=138, height=40, width=40)
+    lit_value_label=Label(frame4, text=lit_value, font=my_font3, bg="#FFFFFF").place(x=548, y=300, height=40, width=50)
+    eth_value_label=Label(frame4, text=eth_value, font=my_font3, bg="#FFFFFF").place(x=548, y=380, height=40, width=50)
+    bch_value_label=Label(frame4, text=bch_value, font=my_font3, bg="#FFFFFF").place(x=548, y=220, height=40, width=50)
+
+    btc_label2 =Label(frame4, text="My BTC wallet", font=my_font2, bg="#FFFFFF").place(x=550, y=105, height=40, width=200)
+    bch_label2 =Label(frame4, text="My BCH wallet", font=my_font2, bg="#FFFFFF").place(x=550, y=180, height=50, width=200)
+    lit_label2 =Label(frame4, text="My LIT wallet", font=my_font2, bg="#FFFFFF").place(x=547, y=260, height=50, width=200)
+    eth_label2 =Label(frame4, text="My ETH wallet", font=my_font2, bg="#FFFFFF").place(x=550, y=340, height=50, width=200)
+
+    btc_amount_label = Label(frame4, text="Rs " + str(btc_balance), bg="#FFFFFF", font=my_font2).place(x=800, y=105, width=160, height=40)
+    bch_amount_label = Label(frame4, text="Rs " + str(bch_balance), bg="#FFFFFF", font=my_font2).place(x=800, y=185, width=160, height=40)
+    lit_amount_label = Label(frame4, text="Rs " + str(lit_balance), bg="#FFFFFF", font=my_font2).place(x=800, y=265, width=160, height=40)
+    eth_amount_label = Label(frame4, text="Rs " + str(eth_balance), bg="#FFFFFF", font=my_font2).place(x=800, y=345, width=160, height=40)
+
+    btc_image_label = Label(frame4, image=btc_image)
+    btc_image_label.image = btc_image
+    btc_image_label.place(x=500, y=110)
+    bch_image_label = Label(frame4, image = bch_image)
+    bch_image_label.image = bch_image
+    bch_image_label.place(x=500, y=190)
+    lit_image_label = Label(frame4, image = lit_image)
+    lit_image_label.image = lit_image
+    lit_image_label.place(x=500, y=270)
+    eth_image_label = Label(frame4, image = eth_image)
+    eth_image_label.image = eth_image
+    eth_image_label.place(x=500, y=350)
+
+    to_entry = Entry(frame4, textvariable=to, bg= "#FFFFFF").place(x=600, y=470, width=350, height=25)
+    amount_entry = Entry(frame4, textvariable=coins_amount, bg= "#FFFFFF").place(x=600, y=520, width=350, height=25)
+
+    send_button = Button(frame4, text="SEND", command=send).place(x=770, y=610, width=100, height=30)
+    # recieve_button = Button(frame4, text="RECIEVE").place(x=585, y=440, width=100, height=30)
+    logout_button = Button(frame4, text= "LOG OUT", command= logout).place(x=887, y=610, width=90, height=30)
+
+    btc_radio_button = Radiobutton(frame4, text="BTC", font=my_font3, variable=option, value= "BTC", bg="#FFFFFF").place(x=490, y=560)
+    btc_radio_button = Radiobutton(frame4, text="BCH", font=my_font3, variable=option, value= "BCH", bg="#FFFFFF").place(x=550, y=560)
+    btc_radio_button = Radiobutton(frame4, text="LIT", font=my_font3, variable=option, value= "LIT", bg="#FFFFFF").place(x=610, y=560)
+    btc_radio_button = Radiobutton(frame4, text="ETH", font=my_font3, variable=option, value= "ETH", bg="#FFFFFF").place(x=670, y=560)
+
+
+
+
 
     data_table()
 
