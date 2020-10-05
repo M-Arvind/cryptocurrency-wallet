@@ -148,10 +148,11 @@ def frame1():
 
     global value
     value = DoubleVar()
+    Title_image = ImageTk.PhotoImage(Image.open("mycoins_image3.png"))
+
     # frame
     frame1 = Frame(root, bg="#FFFFFF").place(x=0, y=0, width=1000, height=650)
-    # labels
-    title_label = Label(frame1, text="CRYPTOCURRENCY", font=("TimesNewRoman 40"), bg="#FFFFFF").place(x=200, y=5, width=600, height=52)
+    title_label = Label(frame1, text="MyCoins", font=("TimesNewRoman 40"), bg="#FFFFFF").place(x=200, y=5, width=600, height=60)
     image_label = Label(frame1, image=IMG, bg="#FFFFFF").place(x=0, y=91)
     cryptype_label = Label(frame1, text="CRYPTYPE", font=("TimesNewRoman 15 bold"), bg="#FFFFFF").place(x=100, y=480, width=137, height=31)
     currency_type_label = Label(frame1,text="CURRENCY TYPE",font=("TimesNewRoman 15 bold"), bg="#FFFFFF").place(x=319, y=480, width=223, height=31)
@@ -413,7 +414,7 @@ def show_frame(frame):
 
 def data_table():
 
-
+    global My_tree2
     style= ttk.Style()
     style.theme_use("alt")
     style.configure("Treeview", rowheight=29, fieldbackground="white")
@@ -475,20 +476,67 @@ def send():
     reciever_address = to.get()
     amount = coins_amount.get()
     sender = name2.get()
+    i=0
+    j=1
+    tag = "odd"
+    confirmation = messagebox.askyesno("Sending", "Are you sure?")
+    if confirmation == True:
+        db = mc.connect(
+            host="localhost",
+            user="root",
+            passwd="arvind",
+            database="crypto_wallet"
+            )
 
-    db = mc.connect(
-        host="localhost",
-        user="root",
-        passwd="arvind",
-        database="crypto_wallet"
-        )
+        cursor = db.cursor()
 
-    cursor = db.cursor()
+        if value=="BTC":
+            query = """UPDATE crypto SET BTC=BTC+%s WHERE Publickey = %s"""
+            cursor.execute(query,(float(amount),reciever_address,))
+            query2 = """UPDATE crypto SET BTC=BTC-%s WHERE username = %s"""
+            cursor.execute(query2,(float(amount),sender,))
+        elif value=="BCH":
+            query = """UPDATE crypto SET BCH=BCH+%s WHERE Publickey = %s"""
+            cursor.execute(query,(float(amount),reciever_address,))
+            query2 = """UPDATE crypto SET BTC=BTC-%s WHERE username = %s"""
+            cursor.execute(query2,(float(amount),sender,))
+        elif value=="LIT":
+            query = """UPDATE crypto SET LIT=LIT+%s WHERE Publickey = %s"""
+            cursor.execute(query,(float(amount),reciever_address,))
+            query2 = """UPDATE crypto SET BTC=BTC-%s WHERE username = %s"""
+            cursor.execute(query2,(float(amount),sender,))
+        elif value=="ETH":
+            query = """UPDATE crypto SET ETH=ETH+%s WHERE Publickey = %s"""
+            cursor.execute(query,(float(amount),reciever_address,))
+            query2 = """UPDATE crypto SET BTC=BTC-%s WHERE username = %s"""
+            cursor.execute(query2,(float(amount),sender,))
 
-    query = """SELECT * FROM crypto WHERE address = %s"""
-    cursor.execute(query, (reciever_address, ))
+        query3 = "SELECT * FROM crypto WHERE username=%s"
+        cursor.execute(query3, (sender,))
+        record= cursor.fetchall()
 
-    record = cursor.fetchall()
+        query4 = "SELECT * FROM crypto WHERE Publickey=%s"
+        cursor.execute(query4, (reciever_address,))
+        record2= cursor.fetchall()
+        print(record2)
+
+    btc_value_label=Label(frame4, text=table_btc, font=my_font3, bg="#FFFFFF").place(x=553, y=138, height=40, width=40)
+    lit_value_label=Label(frame4, text=table_bch, font=my_font3, bg="#FFFFFF").place(x=548, y=300, height=40, width=50)
+    eth_value_label=Label(frame4, text=table_lit, font=my_font3, bg="#FFFFFF").place(x=548, y=380, height=40, width=50)
+    bch_value_label=Label(frame4, text=table_eth, font=my_font3, bg="#FFFFFF").place(x=548, y=220, height=40, width=50)
+
+    My_tree2.insert(parent="", index='end', iid=i, text=j, values=(sender, record2[0][0], amount), tags=(tag,))
+    i+= 1
+    j+=1
+    if tag=="odd":
+        tag="even"
+    elif tag=="even":
+        tag="odd"
+    db.commit()
+    db.close()
+
+
+
 
 def Frame4():
 
@@ -496,6 +544,7 @@ def Frame4():
     global to
     global coins_amount
     global option
+    global my_font3
     frame4 = Frame(root, bg="#FFFFFF").place(x=0, y=0, width=1000, height=650)
 
     to = StringVar()
@@ -518,7 +567,7 @@ def Frame4():
     my_font3 = font.Font(family="Comic Sans MS", size=10)
 
     coins_frame = LabelFrame(frame4, text= "Mycoins",bg="#FFFFFF", font=("ComicSansMS 15"), labelanchor="n").place(x=480, y=80, width=500, height= 350)
-    mytree_frame = LabelFrame(frame4, text="My Transfer", bg="#FFFFFF", font=("ComicSansMS 15"), labelanchor="n").place(x=5, y=80, width=465, height= 349)
+    mytree_frame = LabelFrame(frame4, text="My Transfers", bg="#FFFFFF", font=("ComicSansMS 15"), labelanchor="n").place(x=5, y=80, width=465, height= 349)
     transfer_frame = LabelFrame(frame4, text="Transaction", bg="#FFFFFF", font=("ComicSansMS 15"), labelanchor="n").place(x=480, y=440, width=500, height= 160)
 
     header_label = Label(frame4, bg="#8FA2A3").place(x=0, y=0, width= 1000, height = 70)
