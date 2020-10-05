@@ -46,10 +46,6 @@ MIN_BCH_ENTRY=0.05
 MIN_LIT_ENTRY=0.2
 MIN_ETH_ENTRY=0.1
 
-btc_value=0.00
-bch_value=0.00
-lit_value=0.00
-eth_value=0.00
 
 ##MIN_INR_BTC=1613.18
 ##MIN_DOLLAR_BTC=21.93
@@ -347,6 +343,10 @@ def frame2():
 
 def signing_in():
     global table_username
+    global table_btc
+    global table_bch
+    global table_lit
+    global table_eth
     username = name2.get()
     password = passwd2.get()
     db = mc.connect(
@@ -366,8 +366,12 @@ def signing_in():
     if record == []:
         messagebox.showerror("ERROR", "Username not found!")
     else:
-        table_username = record[0][0]
         if record[0][1] == password:
+            table_username = record[0][0]
+            table_btc = record[0][5]
+            table_bch = record[0][6]
+            table_lit = record[0][7]
+            table_eth = record[0][8]
             show_frame(Frame4)
         else:
             messagebox.showerror("ERROR", "Incorrect password.")
@@ -498,10 +502,10 @@ def Frame4():
     coins_amount = StringVar()
     option = StringVar()
 
-    btc_balance = btc_value * CURRENT_INR_BTC
-    bch_balance = bch_value * CURRENT_INR_BCH
-    lit_balance = lit_value * CURRENT_INR_LIT
-    eth_balance = eth_value * CURRENT_INR_ETH
+    btc_balance = table_btc * CURRENT_INR_BTC
+    bch_balance = table_bch * CURRENT_INR_BCH
+    lit_balance = table_lit * CURRENT_INR_LIT
+    eth_balance = table_eth * CURRENT_INR_ETH
 
     btc_image = ImageTk.PhotoImage(Image.open("btc_icon.png"))
     bch_image = ImageTk.PhotoImage(Image.open("bch_icon.png"))
@@ -527,10 +531,10 @@ def Frame4():
     lit_label =Label(frame4, text="LIT", font=my_font3, bg="#FFFFFF").place(x=585, y=300, height=40, width=50)
     eth_label =Label(frame4, text="ETH", font=my_font3, bg="#FFFFFF").place(x=586, y=380, height=40, width=50)
 
-    btc_value_label=Label(frame4, text=btc_value, font=my_font3, bg="#FFFFFF").place(x=553, y=138, height=40, width=40)
-    lit_value_label=Label(frame4, text=lit_value, font=my_font3, bg="#FFFFFF").place(x=548, y=300, height=40, width=50)
-    eth_value_label=Label(frame4, text=eth_value, font=my_font3, bg="#FFFFFF").place(x=548, y=380, height=40, width=50)
-    bch_value_label=Label(frame4, text=bch_value, font=my_font3, bg="#FFFFFF").place(x=548, y=220, height=40, width=50)
+    btc_value_label=Label(frame4, text=table_btc, font=my_font3, bg="#FFFFFF").place(x=553, y=138, height=40, width=40)
+    lit_value_label=Label(frame4, text=table_bch, font=my_font3, bg="#FFFFFF").place(x=548, y=300, height=40, width=50)
+    eth_value_label=Label(frame4, text=table_lit, font=my_font3, bg="#FFFFFF").place(x=548, y=380, height=40, width=50)
+    bch_value_label=Label(frame4, text=table_eth, font=my_font3, bg="#FFFFFF").place(x=548, y=220, height=40, width=50)
 
     btc_label2 =Label(frame4, text="My BTC wallet", font=my_font2, bg="#FFFFFF").place(x=550, y=105, height=40, width=200)
     bch_label2 =Label(frame4, text="My BCH wallet", font=my_font2, bg="#FFFFFF").place(x=550, y=180, height=50, width=200)
