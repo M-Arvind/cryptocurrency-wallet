@@ -51,6 +51,10 @@ MIN_LIT_ENTRY=0.2
 MIN_ETH_ENTRY=0.1
 
 
+
+# print(I)
+# print(TAG)
+
 ##MIN_INR_BTC=1613.18
 ##MIN_DOLLAR_BTC=21.93
 ##MIN_EURO_BTC=18.77
@@ -146,6 +150,15 @@ def frame1():
     global currencytype_menu
     global amount_entry
     global value_entry
+    global I
+    global J
+    global TAG
+
+    I=0
+    print(I)
+    J=1
+    TAG = "odd"
+    print(TAG)
 
     global coins
     coins = DoubleVar()
@@ -378,6 +391,7 @@ def signing_in():
             table_lit = record[0][7]
             table_eth = record[0][8]
             show_frame(Frame4)
+
         else:
             messagebox.showerror("ERROR", "Incorrect password.")
 
@@ -476,13 +490,11 @@ def data_table():
     My_tree2.place(x= 5, y=115)
 
 def send():
+
     value = option.get()
     reciever_address = to.get()
     amount = coins_amount.get()
     sender = name2.get()
-    i=0
-    j=1
-    tag = "odd"
     confirmation = messagebox.askyesno("Sending", "Are you sure?")
     if confirmation == True:
         db = mc.connect(
@@ -524,20 +536,19 @@ def send():
         record2= cursor.fetchall()
         print(record2)
 
-    btc_value_label=Label(frame4, text=table_btc, font=my_font3, bg="#FFFFFF").place(x=553, y=138, height=40, width=40)
-    lit_value_label=Label(frame4, text=table_bch, font=my_font3, bg="#FFFFFF").place(x=548, y=300, height=40, width=50)
-    eth_value_label=Label(frame4, text=table_lit, font=my_font3, bg="#FFFFFF").place(x=548, y=380, height=40, width=50)
-    bch_value_label=Label(frame4, text=table_eth, font=my_font3, bg="#FFFFFF").place(x=548, y=220, height=40, width=50)
 
-    My_tree2.insert(parent="", index='end', iid=i, text=j, values=(sender, record2[0][0], amount), tags=(tag,))
-    i+= 1
-    j+=1
-    if tag=="odd":
-        tag="even"
-    elif tag=="even":
-        tag="odd"
+
+    My_tree2.insert(parent="", index='end', iid=I, text=J, values=(sender, record2[0][0], amount), tags=(TAG,))
+    I += 1
+    J += 1
+    if TAG == "odd":
+        TAG = "even"
+    elif TAG == "even":
+        TAG = "odd"
     db.commit()
     db.close()
+    print(I)
+    print(TAG)
 
 
 
