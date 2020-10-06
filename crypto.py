@@ -6,6 +6,10 @@ from tkinter import messagebox
 import mysql.connector as mc
 from tkinter import font
 import secrets
+import secrets
+import hashlib
+import ecdsa
+import codecs
 
 
 root = Tk()
