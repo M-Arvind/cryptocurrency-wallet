@@ -10,7 +10,7 @@ import secrets
 
 root = Tk()
 root.title("cryptocurrency")
-root.geometry("1000x650+250+120")
+root.geometry("1000x650+160+20")
 
 IMG = ImageTk.PhotoImage(Image.open("Cryptocurrency_logos.jpg"))
 FRAME_IMG = ImageTk.PhotoImage(Image.open("frame_img2.jpg"))
@@ -272,8 +272,9 @@ def create_wallet():
     db = mc.connect(
             host="localhost",
             user="root",
-            passwd="arvind",
-            database="crypto_wallet"
+            passwd="crypto",
+            database="crypto_wallet",
+            charset="utf8"
             )
     cursor = db.cursor()
 
@@ -353,8 +354,9 @@ def signing_in():
     db = mc.connect(
         host="localhost",
         user="root",
-        passwd="arvind",
-        database="crypto_wallet"
+        passwd="crypto",
+        database="crypto_wallet",
+        charset="utf8"
         )
 
     cursor = db.cursor()
@@ -377,9 +379,8 @@ def signing_in():
         else:
             messagebox.showerror("ERROR", "Incorrect password.")
 
-
-
-
+def forgotpasswd():
+    messagebox.showinfo("Change Password","A mail has been sent to your registered e-mail ID.                  Please follow the steps given to change your password.")    
 
 def Frame3():
     global name2
@@ -404,7 +405,7 @@ def Frame3():
     #buttons
 
     signin_button = Button(frame3, text="SIGN IN", command=signing_in).place(x=540, y= 380, width=120, height=30)
-    forget_password_button = Button(frame3, text="FORGOT PASSWORD").place(x=380, y= 382, width=140, height=28)
+    forgot_password_button = Button(frame3, text="FORGOT PASSWORD", command=forgotpasswd).place(x=380, y= 382, width=140, height=28)
 
     back_button = Button(frame3, text="<--", command=lambda: show_frame(frame1)).place(x=10, y=10, width=40, height=30)
 
@@ -484,8 +485,9 @@ def send():
         db = mc.connect(
             host="localhost",
             user="root",
-            passwd="arvind",
-            database="crypto_wallet"
+            passwd="crypto",
+            database="crypto_wallet",
+            charset="utf8"
             )
 
         cursor = db.cursor()
@@ -630,7 +632,8 @@ def database():
     db = mc.connect(
         host="localhost",
         user="root",
-        passwd="arvind",
+        passwd="crypto",
+        charset="utf8"
 
         )
     cursor = db.cursor()
