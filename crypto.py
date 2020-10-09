@@ -50,6 +50,10 @@ MIN_BCH_ENTRY=0.05
 MIN_LIT_ENTRY=0.2
 MIN_ETH_ENTRY=0.1
 
+transfer_history = []
+
+iid = 0
+id = 0
 
 
 # print(I)
@@ -150,15 +154,7 @@ def frame1():
     global currencytype_menu
     global amount_entry
     global value_entry
-    global I
-    global J
-    global TAG
 
-    I=0
-    print(I)
-    J=1
-    TAG = "odd"
-    print(TAG)
 
     global coins
     coins = DoubleVar()
@@ -289,7 +285,7 @@ def create_wallet():
     db = mc.connect(
             host="localhost",
             user="root",
-            passwd="crypto",
+            passwd="arvind",
             database="crypto_wallet",
             charset="utf8"
             )
@@ -314,6 +310,10 @@ def create_wallet():
 
                 private_key  = private_key_generator()
                 public_key = public_to_address(private_to_compressed_public(private_key))
+
+                with open(username + " keys.txt", 'w') as f:
+                    f.write("Private key = " + private_key + "\nPublic_key = " + public_key)
+
 
                 query = """INSERT INTO crypto (username , password, Email, Publickey, privatekey, BTC, BCH, LIT, ETH) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"""
 
@@ -371,7 +371,7 @@ def signing_in():
     db = mc.connect(
         host="localhost",
         user="root",
-        passwd="crypto",
+        passwd="arvind",
         database="crypto_wallet",
         charset="utf8"
         )
@@ -398,7 +398,7 @@ def signing_in():
             messagebox.showerror("ERROR", "Incorrect password.")
 
 def forgotpasswd():
-    messagebox.showinfo("Change Password","A mail has been sent to your registered e-mail ID.                  Please follow the steps given to change your password.")    
+    messagebox.showinfo("Change Password","A mail has been sent to your registered e-mail ID.                  Please follow the steps given to change your password.")
 
 def Frame3():
     global name2
@@ -431,9 +431,192 @@ def Frame3():
 def show_frame(frame):
     return frame()
 
-def data_table():
+def insert_data():
 
-    global My_tree2
+    global iid
+    global id
+    treeview.insert('', 'end', iid=iid, text=id, values=transfer_history.pop())
+
+    iid = iid + 1
+    id = id + 1
+
+def update_label():
+    global btc
+    global lit
+    global eth
+    global bch
+    global btc_amount
+    global lit_amount
+    global eth_amount
+    global bch_amount
+
+    btc.set(btc_value)
+    lit.set(lit_value)
+    eth.set(eth_value)
+    bch.set(bch_value)
+
+    btc_amount.set(btc_value * CURRENT_INR_BTC)
+    lit_amount.set(lit_value * CURRENT_INR_LIT)
+    eth_amount.set(eth_value * CURRENT_INR_ETH)
+    bch_amount.set(bch_value * CURRENT_INR_BCH)
+
+def send():
+    global record2
+    global amount
+    global value
+    global sender
+    global btc_value
+    global bch_value
+    global lit_value
+    global eth_value
+    value = option.get()
+    reciever_address = to.get()
+    amount = coins_amount.get()
+    sender = name2.get()
+    confirmation = messagebox.askyesno("Sending", "Are you sure?")
+    if confirmation == True:
+        db = mc.connect(
+            host="localhost",
+            user="root",
+            passwd="arvind",
+            database="crypto_wallet",
+            charset="utf8"
+            )
+        cursor = db.cursor()
+
+        query = "SELECT * FROM crypto WHERE username=%s"
+
+        cursor.execute(query, (sender, ))
+        record = cursor.fetchall()
+
+        btc_value = record[0][5]
+        bch_value = record[0][6]
+        lit_value = record[0][7]
+        eth_value = record[0][8]
+
+
+
+        if (value=="BTC" and btc_value > 0):
+            query2 = """UPDATE crypto SET BTC=BTC+%s WHERE Publickey = %s"""
+            cursor.execute(query2,(float(amount),reciever_address,))
+            query3 = """UPDATE crypto SET BTC=BTC-%s WHERE username = %s"""
+            cursor.execute(query3,(float(amount),sender,))
+            query4 = "SELECT * FROM crypto WHERE Publickey=%s"
+            cursor.execute(query4, (reciever_address,))
+            record2 = cursor.fetchall()
+
+            query = "SELECT * FROM crypto WHERE username=%s"
+
+            cursor.execute(query, (sender, ))
+            record = cursor.fetchall()
+
+            btc_value = record[0][5]
+            bch_value = record[0][6]
+            lit_value = record[0][7]
+            eth_value = record[0][8]
+
+            transfer = (sender , record2[0][0], amount, value)
+
+            transfer_history.append(transfer)
+
+            insert_data()
+            update_label()
+
+            db.commit()
+            db.close()
+        elif (value=="BCH" and bch_value > 0):
+            query2 = """UPDATE crypto SET BCH=BCH+%s WHERE Publickey = %s"""
+            cursor.execute(query2,(float(amount),reciever_address,))
+            query3 = """UPDATE crypto SET BCH=BCH-%s WHERE username = %s"""
+            cursor.execute(query3,(float(amount),sender,))
+            query4 = "SELECT * FROM crypto WHERE Publickey=%s"
+            cursor.execute(query4, (reciever_address,))
+            record2 = cursor.fetchall()
+
+            query = "SELECT * FROM crypto WHERE username=%s"
+
+            cursor.execute(query, (sender, ))
+            record = cursor.fetchall()
+
+            btc_value = record[0][5]
+            bch_value = record[0][6]
+            lit_value = record[0][7]
+            eth_value = record[0][8]
+
+            transfer = (sender , record2[0][0], amount, value)
+
+            transfer_history.append(transfer)
+
+            insert_data()
+            db.commit()
+            db.close()
+            update_label()
+        elif (value=="LIT" and lit_value > 0):
+            query2 = """UPDATE crypto SET LIT=LIT+%s WHERE Publickey = %s"""
+            cursor.execute(query2,(float(amount),reciever_address,))
+            query3 = """UPDATE crypto SET LIT=LIT-%s WHERE username = %s"""
+            cursor.execute(query3,(float(amount),sender,))
+            query4 = "SELECT * FROM crypto WHERE Publickey=%s"
+            cursor.execute(query4, (reciever_address,))
+            record2 = cursor.fetchall()
+
+            query = "SELECT * FROM crypto WHERE username=%s"
+
+            cursor.execute(query, (sender, ))
+            record = cursor.fetchall()
+
+            btc_value = record[0][5]
+            bch_value = record[0][6]
+            lit_value = record[0][7]
+            eth_value = record[0][8]
+
+            transfer = (sender , record2[0][0], amount, value)
+
+            transfer_history.append(transfer)
+
+            insert_data()
+
+            db.commit()
+            db.close()
+
+            update_label()
+        elif (value=="ETH" and eth_value > 0):
+            query2 = """UPDATE crypto SET ETH=ETH+%s WHERE Publickey = %s"""
+            cursor.execute(query2,(float(amount),reciever_address,))
+            query3 = """UPDATE crypto SET ETH=ETH-%s WHERE username = %s"""
+            cursor.execute(query3,(float(amount),sender,))
+            query4 = "SELECT * FROM crypto WHERE Publickey=%s"
+            cursor.execute(query4, (reciever_address,))
+            record2 = cursor.fetchall()
+            query = "SELECT * FROM crypto WHERE username=%s"
+
+            cursor.execute(query, (sender, ))
+            record = cursor.fetchall()
+
+            btc_value = record[0][5]
+            bch_value = record[0][6]
+            lit_value = record[0][7]
+            eth_value = record[0][8]
+
+            transfer = (sender , record2[0][0], amount, value)
+
+            transfer_history.append(transfer)
+
+            insert_data()
+
+
+            db.commit()
+            db.close()
+            update_label()
+
+        else:
+            messagebox.showerror("ERROR", "No balance...):")
+
+
+
+def data_table():
+    global treeview
+
     style= ttk.Style()
     style.theme_use("alt")
     style.configure("Treeview", rowheight=29, fieldbackground="white")
@@ -449,7 +632,7 @@ def data_table():
     My_tree2 = ttk.Treeview(frame4)
 
     My_tree['columns'] = ("BTC", "BCH", "LIT", "ETH")
-    My_tree2['columns'] = ("From", "To", "Amount")
+    My_tree2['columns'] = ("From", "To", "Amount", "Cryptype")
 
 
     #formating the column
@@ -459,10 +642,11 @@ def data_table():
     My_tree.column("LIT", width = 92)
     My_tree.column("ETH", width = 92)
 
-    My_tree2.column("#0", width = 115)
-    My_tree2.column("From", width = 115)
-    My_tree2.column("To", width = 115)
-    My_tree2.column("Amount", width = 116)
+    My_tree2.column("#0", width = 60)
+    My_tree2.column("From", width = 102)
+    My_tree2.column("To", width = 103)
+    My_tree2.column("Amount", width = 100)
+    My_tree2.column("Cryptype", width=92)
 
     #HEADING
     My_tree.heading("#0", text="CURRENCY", anchor=W)
@@ -475,6 +659,7 @@ def data_table():
     My_tree2.heading("From", text="From", anchor=W)
     My_tree2.heading("To", text="To", anchor=W)
     My_tree2.heading("Amount", text="Amount", anchor=W)
+    My_tree2.heading("Cryptype", text="Cryptype", anchor=W)
 
     #INSERTING DATA
     My_tree.insert(parent="", index='end', iid=0, text="", values=(), tags=("odd",))
@@ -484,75 +669,17 @@ def data_table():
     My_tree.insert(parent="", index='end', iid=4, text="", values=(), tags=("odd",))
     My_tree.insert(parent="", index='end', iid=5, text="DOLLARS", values=(CURRENT_DOLLAR_BTC, CURRENT_DOLLAR_BCH, CURRENT_DOLLAR_LIT, CURRENT_DOLLAR_ETH), tags=("even",))
 
+
     My_tree.tag_configure('odd', background="white")
     My_tree.tag_configure('even', background="#8FA2A3")
 
+    My_tree2.tag_configure('odd', background="white")
+    My_tree2.tag_configure('even', background="#8FA2A3")
+
     My_tree.place(x= 6, y= 435)
-    My_tree2.place(x= 5, y=115)
+    My_tree2.place(x= 7, y=115)
 
-def send():
-
-    value = option.get()
-    reciever_address = to.get()
-    amount = coins_amount.get()
-    sender = name2.get()
-    confirmation = messagebox.askyesno("Sending", "Are you sure?")
-    if confirmation == True:
-        db = mc.connect(
-            host="localhost",
-            user="root",
-            passwd="crypto",
-            database="crypto_wallet",
-            charset="utf8"
-            )
-
-        cursor = db.cursor()
-
-        if value=="BTC":
-            query = """UPDATE crypto SET BTC=BTC+%s WHERE Publickey = %s"""
-            cursor.execute(query,(float(amount),reciever_address,))
-            query2 = """UPDATE crypto SET BTC=BTC-%s WHERE username = %s"""
-            cursor.execute(query2,(float(amount),sender,))
-        elif value=="BCH":
-            query = """UPDATE crypto SET BCH=BCH+%s WHERE Publickey = %s"""
-            cursor.execute(query,(float(amount),reciever_address,))
-            query2 = """UPDATE crypto SET BTC=BTC-%s WHERE username = %s"""
-            cursor.execute(query2,(float(amount),sender,))
-        elif value=="LIT":
-            query = """UPDATE crypto SET LIT=LIT+%s WHERE Publickey = %s"""
-            cursor.execute(query,(float(amount),reciever_address,))
-            query2 = """UPDATE crypto SET BTC=BTC-%s WHERE username = %s"""
-            cursor.execute(query2,(float(amount),sender,))
-        elif value=="ETH":
-            query = """UPDATE crypto SET ETH=ETH+%s WHERE Publickey = %s"""
-            cursor.execute(query,(float(amount),reciever_address,))
-            query2 = """UPDATE crypto SET BTC=BTC-%s WHERE username = %s"""
-            cursor.execute(query2,(float(amount),sender,))
-
-        query3 = "SELECT * FROM crypto WHERE username=%s"
-        cursor.execute(query3, (sender,))
-        record= cursor.fetchall()
-
-        query4 = "SELECT * FROM crypto WHERE Publickey=%s"
-        cursor.execute(query4, (reciever_address,))
-        record2= cursor.fetchall()
-        print(record2)
-
-
-
-    My_tree2.insert(parent="", index='end', iid=I, text=J, values=(sender, record2[0][0], amount), tags=(TAG,))
-    I += 1
-    J += 1
-    if TAG == "odd":
-        TAG = "even"
-    elif TAG == "even":
-        TAG = "odd"
-    db.commit()
-    db.close()
-    print(I)
-    print(TAG)
-
-
+    treeview = My_tree2
 
 
 def Frame4():
@@ -562,6 +689,22 @@ def Frame4():
     global coins_amount
     global option
     global my_font3
+    global iid
+    global id
+    global btc
+    global lit
+    global eth
+    global bch
+    global btc_amount
+    global lit_amount
+    global eth_amount
+    global bch_amount
+
+    iid = 0
+    id = 0
+
+
+
     frame4 = Frame(root, bg="#FFFFFF").place(x=0, y=0, width=1000, height=650)
 
     to = StringVar()
@@ -597,20 +740,39 @@ def Frame4():
     lit_label =Label(frame4, text="LIT", font=my_font3, bg="#FFFFFF").place(x=585, y=300, height=40, width=50)
     eth_label =Label(frame4, text="ETH", font=my_font3, bg="#FFFFFF").place(x=586, y=380, height=40, width=50)
 
-    btc_value_label=Label(frame4, text=table_btc, font=my_font3, bg="#FFFFFF").place(x=553, y=138, height=40, width=40)
-    lit_value_label=Label(frame4, text=table_bch, font=my_font3, bg="#FFFFFF").place(x=548, y=300, height=40, width=50)
-    eth_value_label=Label(frame4, text=table_lit, font=my_font3, bg="#FFFFFF").place(x=548, y=380, height=40, width=50)
-    bch_value_label=Label(frame4, text=table_eth, font=my_font3, bg="#FFFFFF").place(x=548, y=220, height=40, width=50)
+    btc = StringVar()
+    btc.set(table_btc)
+    lit = StringVar()
+    lit.set(table_lit)
+    eth = StringVar()
+    eth.set(table_eth)
+    bch = StringVar()
+    bch.set(table_bch)
+
+    btc_amount = StringVar()
+    btc_amount.set("Rs " + str(btc_balance))
+    lit_amount = StringVar()
+    lit_amount.set("Rs " + str(lit_balance))
+    eth_amount = StringVar()
+    eth_amount.set("Rs " + str(eth_balance))
+    bch_amount = StringVar()
+    bch_amount.set("Rs " + str(bch_balance))
+
+
+    btc_value_label=Label(frame4, textvariable=btc, font=my_font3, bg="#FFFFFF").place(x=553, y=138, height=40, width=40)
+    lit_value_label=Label(frame4, textvariable=lit, font=my_font3, bg="#FFFFFF").place(x=548, y=300, height=40, width=50)
+    eth_value_label=Label(frame4, textvariable=eth, font=my_font3, bg="#FFFFFF").place(x=548, y=380, height=40, width=50)
+    bch_value_label=Label(frame4, textvariable=bch, font=my_font3, bg="#FFFFFF").place(x=548, y=220, height=40, width=50)
 
     btc_label2 =Label(frame4, text="My BTC wallet", font=my_font2, bg="#FFFFFF").place(x=550, y=105, height=40, width=200)
     bch_label2 =Label(frame4, text="My BCH wallet", font=my_font2, bg="#FFFFFF").place(x=550, y=180, height=50, width=200)
     lit_label2 =Label(frame4, text="My LIT wallet", font=my_font2, bg="#FFFFFF").place(x=547, y=260, height=50, width=200)
     eth_label2 =Label(frame4, text="My ETH wallet", font=my_font2, bg="#FFFFFF").place(x=550, y=340, height=50, width=200)
 
-    btc_amount_label = Label(frame4, text="Rs " + str(btc_balance), bg="#FFFFFF", font=my_font2).place(x=800, y=105, width=160, height=40)
-    bch_amount_label = Label(frame4, text="Rs " + str(bch_balance), bg="#FFFFFF", font=my_font2).place(x=800, y=185, width=160, height=40)
-    lit_amount_label = Label(frame4, text="Rs " + str(lit_balance), bg="#FFFFFF", font=my_font2).place(x=800, y=265, width=160, height=40)
-    eth_amount_label = Label(frame4, text="Rs " + str(eth_balance), bg="#FFFFFF", font=my_font2).place(x=800, y=345, width=160, height=40)
+    bch_amount_label = Label(frame4, textvariable = bch_amount, bg="#FFFFFF", font=my_font2).place(x=800, y=185, width=160, height=40)
+    lit_amount_label = Label(frame4, textvariable = lit_amount, bg="#FFFFFF", font=my_font2).place(x=800, y=265, width=160, height=40)
+    eth_amount_label = Label(frame4, textvariable = eth_amount, bg="#FFFFFF", font=my_font2).place(x=800, y=345, width=160, height=40)
+    btc_amount_label = Label(frame4, textvariable = btc_amount, bg="#FFFFFF", font=my_font2).place(x=800, y=105, width=160, height=40)
 
     btc_image_label = Label(frame4, image=btc_image)
     btc_image_label.image = btc_image
@@ -637,17 +799,14 @@ def Frame4():
     btc_radio_button = Radiobutton(frame4, text="LIT", font=my_font3, variable=option, value= "LIT", bg="#FFFFFF").place(x=610, y=560)
     btc_radio_button = Radiobutton(frame4, text="ETH", font=my_font3, variable=option, value= "ETH", bg="#FFFFFF").place(x=670, y=560)
 
-
-
-
-
     data_table()
+
 
 def database():
     db = mc.connect(
         host="localhost",
         user="root",
-        passwd="crypto",
+        passwd="arvind",
         charset="utf8"
 
         )
@@ -669,7 +828,8 @@ def database():
              ETH float(10)
              )
             """)
-    cursor.close()
+
+    db.close()
 
 
 frame1()
