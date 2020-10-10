@@ -6,7 +6,6 @@ from tkinter import messagebox
 import mysql.connector as mc
 from tkinter import font
 import secrets
-import secrets
 import hashlib
 import ecdsa
 import codecs
@@ -278,6 +277,7 @@ def signup_destroy():
 
 
 def create_wallet():
+    global username
     username = name.get()
     password = passwd.get()
     email = mail.get()
@@ -320,6 +320,15 @@ def create_wallet():
                 values_tuple = (username , password, email, public_key, private_key, 0.0, 0.0, 0.0, 0.0)
 
                 cursor.execute(query, values_tuple)
+                query1 = """CREATE TABLE {}
+                            (sender varchar(50),
+                            reciever varchar(50),
+                            amount float(50),
+                            cryptype varchar(50)
+                            )
+                            """.format(username)
+
+                cursor.execute(query1)
 
                 db.commit()
 
@@ -360,12 +369,40 @@ def frame2():
     create_account_button = Button(frame2, text="CREATE ACCOUNT", command=create_wallet).place(x=450, y=422, width=150, height=35)
     back_button = Button(frame2, text="<--", command=lambda: show_frame(frame1)).place(x=10, y=10, width=40, height=30)
 
+def update_tree():
+    db = mc.connect(
+        host="localhost",
+        user="root",
+        passwd="arvind",
+        database="crypto_wallet",
+        charset="utf8"
+        )
+
+    cursor = db.cursor()
+    user = name2.get()
+    global iid
+    global id
+    query2 = "SELECT * FROM {}".format(user)
+    cursor.execute(query2)
+    details = cursor.fetchall()
+    if details == []:
+        pass
+    else:
+        for item in details:
+            treeview.insert('', 'end', iid=iid, text=id, values=item)
+            iid += 1
+            id +=1
+
 def signing_in():
+    global iid
+    global id
     global table_username
     global table_btc
     global table_bch
     global table_lit
     global table_eth
+    iid = 0
+    id = 0
     username = name2.get()
     password = passwd2.get()
     db = mc.connect(
@@ -392,10 +429,19 @@ def signing_in():
             table_bch = record[0][6]
             table_lit = record[0][7]
             table_eth = record[0][8]
+
+
+
             show_frame(Frame4)
+            data_table()
+            update_tree()
 
         else:
             messagebox.showerror("ERROR", "Incorrect password.")
+
+
+
+
 
 def forgotpasswd():
     messagebox.showinfo("Change Password","A mail has been sent to your registered e-mail ID.                  Please follow the steps given to change your password.")
@@ -521,6 +567,8 @@ def send():
 
             insert_data()
             update_label()
+            query5 = "INSERT INTO {} (sender, reciever, amount, cryptype) VALUES{}".format(sender, transfer)
+            cursor.execute(query5)
 
             db.commit()
             db.close()
@@ -548,9 +596,12 @@ def send():
             transfer_history.append(transfer)
 
             insert_data()
+            update_label()
+            query5 = "INSERT INTO {} VALUES{}".format(sender, transfer)
+            cursor.execute(query5)
             db.commit()
             db.close()
-            update_label()
+
         elif (value=="LIT" and lit_value > 0):
             query2 = """UPDATE crypto SET LIT=LIT+%s WHERE Publickey = %s"""
             cursor.execute(query2,(float(amount),reciever_address,))
@@ -575,11 +626,13 @@ def send():
             transfer_history.append(transfer)
 
             insert_data()
+            update_label()
+            query5 = "INSERT INTO {} VALUES{}".format(sender, transfer)
+            cursor.execute(query5)
 
             db.commit()
             db.close()
 
-            update_label()
         elif (value=="ETH" and eth_value > 0):
             query2 = """UPDATE crypto SET ETH=ETH+%s WHERE Publickey = %s"""
             cursor.execute(query2,(float(amount),reciever_address,))
@@ -603,11 +656,12 @@ def send():
             transfer_history.append(transfer)
 
             insert_data()
-
-
+            update_label()
+            query5 = "INSERT INTO {} VALUES{}".format(sender, transfer)
+            cursor.execute(query5)
             db.commit()
             db.close()
-            update_label()
+
 
         else:
             messagebox.showerror("ERROR", "No balance...):")
@@ -689,8 +743,6 @@ def Frame4():
     global coins_amount
     global option
     global my_font3
-    global iid
-    global id
     global btc
     global lit
     global eth
@@ -700,8 +752,6 @@ def Frame4():
     global eth_amount
     global bch_amount
 
-    iid = 0
-    id = 0
 
 
 
@@ -769,10 +819,10 @@ def Frame4():
     lit_label2 =Label(frame4, text="My LIT wallet", font=my_font2, bg="#FFFFFF").place(x=547, y=260, height=50, width=200)
     eth_label2 =Label(frame4, text="My ETH wallet", font=my_font2, bg="#FFFFFF").place(x=550, y=340, height=50, width=200)
 
-    bch_amount_label = Label(frame4, textvariable = bch_amount, bg="#FFFFFF", font=my_font2).place(x=800, y=185, width=160, height=40)
-    lit_amount_label = Label(frame4, textvariable = lit_amount, bg="#FFFFFF", font=my_font2).place(x=800, y=265, width=160, height=40)
-    eth_amount_label = Label(frame4, textvariable = eth_amount, bg="#FFFFFF", font=my_font2).place(x=800, y=345, width=160, height=40)
-    btc_amount_label = Label(frame4, textvariable = btc_amount, bg="#FFFFFF", font=my_font2).place(x=800, y=105, width=160, height=40)
+    bch_amount_label = Label(frame4, textvariable = bch_amount, bg="#FFFFFF", font="ComicSansMS 14 bold").place(x=800, y=185, width=160, height=40)
+    lit_amount_label = Label(frame4, textvariable = lit_amount, bg="#FFFFFF", font="ComicSansMS 14 bold").place(x=800, y=265, width=160, height=40)
+    eth_amount_label = Label(frame4, textvariable = eth_amount, bg="#FFFFFF", font="ComicSansMS 14 bold").place(x=800, y=345, width=160, height=40)
+    btc_amount_label = Label(frame4, textvariable = btc_amount, bg="#FFFFFF", font="ComicSansMS 14 bold").place(x=800, y=105, width=160, height=40)
 
     btc_image_label = Label(frame4, image=btc_image)
     btc_image_label.image = btc_image
@@ -799,7 +849,7 @@ def Frame4():
     btc_radio_button = Radiobutton(frame4, text="LIT", font=my_font3, variable=option, value= "LIT", bg="#FFFFFF").place(x=610, y=560)
     btc_radio_button = Radiobutton(frame4, text="ETH", font=my_font3, variable=option, value= "ETH", bg="#FFFFFF").place(x=670, y=560)
 
-    data_table()
+
 
 
 def database():
