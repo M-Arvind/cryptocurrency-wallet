@@ -15,8 +15,8 @@ root = Tk()
 root.title("cryptocurrency")
 root.geometry("1000x650+160+20")
 
-IMG = ImageTk.PhotoImage(Image.open("Cryptocurrency_logos.jpg"))
-FRAME_IMG = ImageTk.PhotoImage(Image.open("frame_img2.jpg"))
+IMG = ImageTk.PhotoImage(Image.open("./images/Cryptocurrency_logos.jpg"))
+FRAME_IMG = ImageTk.PhotoImage(Image.open("./images/frame2_img.jpg"))
 
 
 CRYPTYPE = ["BTC", "BCH", "LIT", "ETH"]
@@ -160,7 +160,7 @@ def frame1():
 
     global value
     value = DoubleVar()
-    Title_image = ImageTk.PhotoImage(Image.open("mycoins_image3.png"))
+
 
     # frame
     frame1 = Frame(root, bg="#FFFFFF").place(x=0, y=0, width=1000, height=650)
@@ -766,10 +766,10 @@ def Frame4():
     lit_balance = table_lit * CURRENT_INR_LIT
     eth_balance = table_eth * CURRENT_INR_ETH
 
-    btc_image = ImageTk.PhotoImage(Image.open("btc_icon.png"))
-    bch_image = ImageTk.PhotoImage(Image.open("bch_icon.png"))
-    lit_image = ImageTk.PhotoImage(Image.open("lit_icon.png"))
-    eth_image = ImageTk.PhotoImage(Image.open("eth_icon.png"))
+    btc_image = ImageTk.PhotoImage(Image.open("./images/btc_icon.png"))
+    bch_image = ImageTk.PhotoImage(Image.open("./images/bch_icon.png"))
+    lit_image = ImageTk.PhotoImage(Image.open("./images/lit_icon.png"))
+    eth_image = ImageTk.PhotoImage(Image.open("./images/eth_icon.png"))
 
 
     my_font = font.Font(family="Comic Sans MS", size=30)
